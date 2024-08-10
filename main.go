@@ -1,8 +1,9 @@
 package main
 
 import (
-	"api_generator/internal"
 	"fmt"
+
+	"github.com/Ahbari-M/PL-SQL-API-Generator/internal"
 )
 
 func main() {
