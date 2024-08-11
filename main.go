@@ -1,14 +1,13 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/Ahbari-M/PL-SQL-API-Generator/internal"
 )
 
 func main() {
 
-	ddl := "CREATE TABLE test (id INT PRIMARY KEY, name VARCHAR(255), age INT); CREATE TABLE test2 (id INT PRIMARY KEY, name VARCHAR(255), age INT);"
+	ddl, _ := internal.ReadFile("./ddl.sql")
+
 	parser := internal.NewParser(ddl)
 
 	tables := parser.Run()
@@ -21,10 +20,10 @@ func main() {
 		pkgBuilder.AddInsertProcedure()
 		pkgBuilder.AddUpdateProcedure()
 
-		fmt.Println(pkgBuilder.Generate())
+		pkgBuilder.Generate()
 
-		fmt.Println("/")
-		fmt.Println()
+		// fmt.Println("/")
+		// fmt.Println()
 	}
 
 }
