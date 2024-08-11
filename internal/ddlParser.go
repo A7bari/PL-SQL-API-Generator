@@ -18,10 +18,16 @@ func NewParser(ddl string) *Parser {
 	return &Parser{tokens: ToknizeDDL(ddl), pos: 0, start: 0, tables: []*Table{}}
 }
 
-func (p *Parser) Run() {
+func (p *Parser) Run() []*Table {
 	for state := Initial; state != nil; {
 		state = state(p)
 	}
+
+	if p.current != nil {
+		p.addTable()
+	}
+
+	return p.tables
 }
 
 func (p *Parser) GetTables() []*Table {

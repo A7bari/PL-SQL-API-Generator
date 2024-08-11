@@ -10,10 +10,11 @@ func main() {
 
 	ddl := "CREATE TABLE test (id INT PRIMARY KEY, name VARCHAR(255), age INT); CREATE TABLE test2 (id INT PRIMARY KEY, name VARCHAR(255), age INT);"
 	parser := internal.NewParser(ddl)
-	parser.Run()
 
-	tables := parser.GetTables()
+	tables := parser.Run()
 	pkgBuilder := internal.NewBkgBuilder(nil)
+	pkgBuilder.SetGenerateFolder("./files")
+
 	for _, table := range tables {
 		pkgBuilder.SetTable(table)
 		pkgBuilder.AddGetProcedure()
