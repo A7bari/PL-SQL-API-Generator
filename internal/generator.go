@@ -3,18 +3,30 @@ package internal
 import "fmt"
 
 type BkgBuilder struct {
-	table      *Table
-	procedures []Procedure
+	table         *Table
+	procedures    []Procedure
+	generate_path string
+	filePrefix    string
 }
 
 func NewBkgBuilder(table *Table) *BkgBuilder {
-	return &BkgBuilder{table: table}
+	return &BkgBuilder{table: table, generate_path: "", procedures: []Procedure{}, filePrefix: "api"}
+}
+
+func (g *BkgBuilder) SetFilePrefix(prefix string) *BkgBuilder {
+	g.filePrefix = prefix
+	return g
 }
 
 func (g *BkgBuilder) SetTable(table *Table) *BkgBuilder {
 	g.table = table
 	// reset procedures
 	g.procedures = []Procedure{}
+	return g
+}
+
+func (g *BkgBuilder) SetGenerateFolder(path string) *BkgBuilder {
+	g.generate_path = path
 	return g
 }
 
@@ -52,7 +64,22 @@ func (g *BkgBuilder) AddUpdateProcedure() *BkgBuilder {
 }
 
 func (g *BkgBuilder) Generate() string {
-	return g.generatePkgSpic() + "\n/\n" + g.generatePkgBody()
+	if g.table == nil {
+		panic("table is not set")
+	}
+
+	if len(g.procedures) == 0 {
+		panic("no procedures added")
+	}
+
+	content := g.generatePkgSpic() + "\n\n" + g.generatePkgBody()
+
+	if g.generate_path != "" {
+		path := g.generate_path + "/" + g.table.name + "_" + g.filePrefix + ".sql"
+		WriteToFile(content, path)
+	}
+
+	return content
 }
 
 func (g *BkgBuilder) generatePkgSpic() string {
