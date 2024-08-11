@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -15,7 +16,9 @@ type Parser struct {
 type StateFn func(*Parser) StateFn
 
 func NewParser(ddl string) *Parser {
-	return &Parser{tokens: ToknizeDDL(ddl), pos: 0, start: 0, tables: []*Table{}}
+	tokens := ToknizeDDL(ddl)
+	fmt.Println(tokens)
+	return &Parser{tokens: tokens, pos: 0, start: 0, tables: []*Table{}}
 }
 
 func (p *Parser) Run() []*Table {
@@ -199,14 +202,19 @@ func ConstraintState(p *Parser) StateFn {
 func ToknizeDDL(ddl string) []string {
 	var tokens []string
 	var token string
-	for _, c := range strings.ToLower(ddl) {
-		if c == ' ' || c == ',' || c == '(' || c == ')' {
+	ddl = strings.NewReplacer(
+		"\n", " ",
+		"\r", " ",
+		"\t", " ",
+		"(", " ( ",
+		")", " ) ",
+		",", " , ",
+	).Replace(strings.ToLower(ddl))
+
+	for _, c := range ddl {
+		if c == ' ' {
 			if token != "" {
 				tokens = append(tokens, token)
-				token = ""
-			}
-			if c != ' ' {
-				tokens = append(tokens, string(c))
 				token = ""
 			}
 			continue
